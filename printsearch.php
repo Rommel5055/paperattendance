@@ -63,22 +63,30 @@ if(is_siteadmin()){
 	$paths = 1;
 */	
 	//Query to get all the courses for the admin
-	$sqlcourses = "SELECT c.id,
+    $param = explode("," ,$CFG->paperattendance_enrolmethod);
+    list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
+    $param2 = ["profesoreditor"];//maybe in production the role should be profesoreditor
+    $params = array_merge($param1, $param2);
+    $sqlcourses = "SELECT
+                CONCAT(c.id,'-',u.id) as superid,
+                c.id,
 				c.fullname,
 				cat.name,
 				u.id as teacherid,
 				CONCAT( u.firstname, ' ', u.lastname) as teacher
 				FROM {user} AS u
+                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
+				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
 				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
 				INNER JOIN {context} ct ON (ct.id = ra.contextid)
 				INNER JOIN {course} c ON (c.id = ct.instanceid)
-				INNER JOIN {role} r ON (r.id = ra.roleid AND r.id IN ( 3, 4))
+				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
 				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
 				WHERE c.idnumber > 0
-				GROUP BY c.id
+				GROUP BY c.id, CONCAT(c.id,'-',u.id)
 				ORDER BY c.fullname";
-	$ncourses = count($DB->get_records_sql($sqlcourses));
-	$courses = $DB->get_records_sql($sqlcourses, null, $page*$perpage,$perpage);
+	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
+	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
 	$paths = 1;
 }
 else{
@@ -111,23 +119,31 @@ else{
 	}else{
 		print_error(get_string('notallowedprint', 'local_paperattendance'));
 	}
-	$sqlcoursesparam = array('50', 3);
-	$sqlcourses= "SELECT c.id,
-	c.fullname,
-	cat.name,
-	u.id as teacherid,
-	CONCAT( u.firstname, ' ', u.lastname) as teacher
-	FROM {user} u
-	INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
-	INNER JOIN {enrol} e ON (e.id = ue.enrolid)
-	INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
-	INNER JOIN {context} ct ON (ct.id = ra.contextid)
-	INNER JOIN {course} c ON (c.id = ct.instanceid AND e.courseid = c.id)
-	INNER JOIN {course_categories} as cat ON (cat.id = c.category)
-	INNER JOIN {role} r ON (r.id = ra.roleid)
-	WHERE ct.contextlevel = ? AND r.id = ?
-	AND $like AND c.idnumber > 0
-	GROUP BY c.id";
+	$param = explode("," ,$CFG->paperattendance_enrolmethod);
+	list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
+	$param2 = ["profesoreditor", "profesornoeditor"];
+	$param3 = array('50', 3);
+	$sqlcoursesparam = array_merge($param1, $param2, $param3);
+	$sqlcourses= "SELECT
+                CONCAT(c.id,'-',u.id) as superid,
+                c.id,
+				c.fullname,
+				cat.name,
+				u.id as teacherid,
+				CONCAT( u.firstname, ' ', u.lastname) as teacher
+				FROM {user} AS u
+                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
+				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
+				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
+				INNER JOIN {context} ct ON (ct.id = ra.contextid)
+				INNER JOIN {course} c ON (c.id = ct.instanceid)
+				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
+				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
+				WHERE c.idnumber > 0
+                AND ct.contextlevel = ? AND r.id = ?
+                AND $like
+				GROUP BY c.id, CONCAT(c.id,'-',u.id)
+				ORDER BY c.fullname";
 
 	$ncourses = count($DB->get_records_sql($sqlcourses,$sqlcoursesparam));
 	$courses = $DB->get_records_sql($sqlcourses, $sqlcoursesparam, $page*$perpage,$perpage);
