@@ -135,7 +135,7 @@ switch ($action) {
 						cat.name,
 						u.id as teacherid,
 						CONCAT( u.firstname, ' ', u.lastname) as teacher
-						FROM {role} AS r
+						FROM {user} AS u
 						INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				        INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
         				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
@@ -181,6 +181,7 @@ switch ($action) {
 		}
 		$parametros = array_merge($params, $filter);
 		$courses = $DB->get_records_sql($sqlcourses, $parametros);
+
 	
 		echo json_encode($courses);
 		break;
