@@ -16,6 +16,8 @@ list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
 $param2 = ["profesoreditor", "profesornoeditor"];
 $params = array_merge($param1, $param2);
 var_dump($params);
+echo "<br>";
+var_dump("lalalala");
 
 $query = "SELECT 
                 CONCAT(c.id,'-',u.id) as superid,
