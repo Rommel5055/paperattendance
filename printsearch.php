@@ -90,6 +90,8 @@ if(is_siteadmin()){
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
 				ORDER BY c.fullname";
 	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
+	echo "n° courses: ";
+	echo $ncourses;
 	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
 	foreach($courses as $c){
 	    echo "<br>";
