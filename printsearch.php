@@ -67,6 +67,7 @@ if(is_siteadmin()){
     list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
     $param2 = ["profesoreditor"];
     $params = array_merge($param1, $param2);
+    var_dump($params);
     $sqlcourses = "SELECT
                 CONCAT(c.id,'-',u.id) as superid,
                 c.id,
