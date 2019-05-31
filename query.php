@@ -236,6 +236,8 @@ $sqlcourses = "SELECT
 $results = $DB->get_records_sql($query, $params);
 foreach($results as $r){
     var_dump($r);
+    
+    echo "<br>";
 }
 
 echo "<table border = 1>
