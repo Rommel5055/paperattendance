@@ -78,7 +78,7 @@ if(is_siteadmin()){
                 r.shortname as role
 
                 FROM {course_categories} as cat
-                INNER JOIN {course} as c ON ON (cat.id = c.category)
+                INNER JOIN {course} as c ON (cat.id = c.category)
                 INNER JOIN {context} as ct ON (c.id = ct.instanceid)
                 INNER JOIN {role_assignments} as ra ON (ct.id = ra.contextid)
                 INNER JOIN {role} as r ON (r.id = ra.roleid AND r.shortname $sqlin)
