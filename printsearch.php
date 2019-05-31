@@ -74,7 +74,9 @@ if(is_siteadmin()){
 				c.fullname,
 				cat.name,
 				u.id as teacherid,
-				CONCAT( u.firstname, ' ', u.lastname) as teacher
+				CONCAT( u.firstname, ' ', u.lastname) as teacher,
+                e.enrol,
+                r.shortname as role
 				FROM {user} AS u
                 INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
@@ -88,6 +90,11 @@ if(is_siteadmin()){
 				ORDER BY c.fullname";
 	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
 	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
+	foreach ($courses as $course2){
+	    var_dump($course2);
+	    echo "<br>";
+	}
+	
 	$paths = 1;
 }
 else{
