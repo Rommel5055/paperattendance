@@ -234,6 +234,9 @@ $sqlcourses = "SELECT
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
 				ORDER BY c.fullname";
 $results = $DB->get_records_sql($query, $params);
+foreach($results as $r){
+    var_dump($r);
+}
 
 echo "<table border = 1>
         <tr>
