@@ -209,10 +209,9 @@ echo"###########################################################################
 $param = explode("," ,$CFG->paperattendance_enrolmethod);
 list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
 $param2 = ["profesoreditor"];
-$params = array_merge($param1, $param2);
+$params = array_merge($param2, $param1);
 var_dump($params);
-
-$query = "SELECT
+$sqlcourses = "SELECT
                 CONCAT(c.id,'-',u.id) as superid,
                 c.id,
 				c.fullname,
@@ -221,14 +220,16 @@ $query = "SELECT
 				CONCAT( u.firstname, ' ', u.lastname) as teacher,
                 e.enrol,
                 r.shortname as role
-				FROM {user} AS u
+                
+                FROM {course_categories} as cat
+                INNER JOIN {course} as c ON (cat.id = c.category)
+                INNER JOIN {context} as ct ON (c.id = ct.instanceid)
+                INNER JOIN {role_assignments} as ra ON (ct.id = ra.contextid)
+                INNER JOIN {role} as r ON (r.id = ra.roleid AND r.shortname $sqlin)
+                INNER JOIN {user} as u ON (ra.userid = u.id)
                 INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
-				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
-				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
-				INNER JOIN {context} ct ON (ct.id = ra.contextid)
-				INNER JOIN {course} c ON (c.id = ct.instanceid)
-				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
-				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
+				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol = ?)
+				
 				WHERE c.idnumber > 0
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
 				ORDER BY c.fullname";
