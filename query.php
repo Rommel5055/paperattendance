@@ -174,6 +174,35 @@ foreach ($results as $row){
 echo "</table>";
 echo "<br>";
 
+
+
+echo "Roles<br>";
+$query = "SELECT * FROM {role}";
+$results = $DB->get_records_sql($query);
+echo "<table border = 1>
+        <tr>
+        <th>id</th>
+        <th>name</th>
+        <th>shortname</th>
+        <th>description</th>
+        <th>sortorder</th>
+        <th>archetype</th>
+        </tr>
+        ";
+foreach ($results as $row){
+    echo "<tr>";
+    echo "<td>". $row->id."</td>";
+    echo "<td>". $row->name."</td>";
+    echo "<td>". $row->shortname."</td>";
+    echo "<td>". $row->description."</td>";
+    echo "<td>". $row->sortorder."</td>";
+    echo "<td>". $row->archetype."</td>";
+    echo "</tr>";
+}
+echo "</table>";
+echo "<br>";
+
+
 echo"################################################################################################<br>";
 echo"###############################Print Search#####################################################<br>";
 echo"################################################################################################<br>";
