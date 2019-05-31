@@ -90,10 +90,6 @@ if(is_siteadmin()){
 				ORDER BY c.fullname";
 	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
 	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
-	foreach ($courses as $course2){
-	    var_dump($course2);
-	    echo "<br>";
-	}
 	
 	$paths = 1;
 }
