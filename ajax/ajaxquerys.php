@@ -126,18 +126,23 @@ switch ($action) {
 */			
 			//Query without date filter
 			$filter = array("%".$data."%", $data."%");
-			list($sqlin, $parametros1) = $DB->get_in_or_equal(array(3,4));
+			$param = explode("," ,$CFG->paperattendance_enrolmethod);
+			list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
+			$param2 = ["profesoreditor"];
+			$params = array_merge($param1, $param2);
 			$sqlcourses = "SELECT c.id,
 						c.fullname,
 						cat.name,
 						u.id as teacherid,
 						CONCAT( u.firstname, ' ', u.lastname) as teacher
 						FROM {role} AS r
-						INNER JOIN {role_assignments} ra ON (ra.roleid = r.id AND r.id $sqlin)
-						INNER JOIN {context} ct ON (ct.id = ra.contextid)
-						INNER JOIN {course} c ON (c.id = ct.instanceid)
-						INNER JOIN {user} u ON (u.id = ra.userid)
-						INNER JOIN {course_categories} as cat ON (cat.id = c.category)
+						INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
+				        INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
+        				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
+        				INNER JOIN {context} ct ON (ct.id = ra.contextid)
+        				INNER JOIN {course} c ON (c.id = ct.instanceid)
+        				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
+        				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
 						WHERE ( c.idnumber > 0 ) AND (CONCAT( u.firstname, ' ', u.lastname) like ? OR c.fullname like ?)
 						GROUP BY c.id
 						ORDER BY c.fullname";
