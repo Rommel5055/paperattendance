@@ -77,12 +77,12 @@ if(is_siteadmin()){
                 e.enrol,
                 r.shortname as role
 
-                FROM {course_categories} as cat
-                INNER JOIN {course} as c ON (cat.id = c.category)
-                INNER JOIN {context} as ct ON (c.id = ct.instanceid)
-                INNER JOIN {role_assignments} as ra ON (ct.id = ra.contextid)
-                INNER JOIN {role} as r ON (r.id = ra.roleid AND r.shortname $sqlin)
-                INNER JOIN {user} as u ON (ra.userid = u.id)
+                FROM {course_categories} cat
+                INNER JOIN {course} c ON (cat.id = c.category)
+                INNER JOIN {context} ct ON (c.id = ct.instanceid)
+                INNER JOIN {role_assignments} ra ON (ct.id = ra.contextid)
+                INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname $sqlin)
+                INNER JOIN {user} u ON (ra.userid = u.id)
                 INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol = ?)
 
@@ -94,14 +94,14 @@ if(is_siteadmin()){
 	
 	$paths = 1;
 	/*
-	 * --FROM {user} AS u
+	 *          FROM {user} AS u
                 INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
-				--INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
-				--INNER JOIN {context} ct ON (ct.id = ra.contextid)
-				--INNER JOIN {course} c ON (c.id = ct.instanceid)
-				--INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
-				--INNER JOIN {course_categories} as cat ON (cat.id = c.category)
+				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
+				INNER JOIN {context} ct ON (ct.id = ra.contextid)
+				INNER JOIN {course} c ON (c.id = ct.instanceid)
+				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
+				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
 	 */
 }
 else{
