@@ -126,7 +126,7 @@ echo"###########################################################################
 
 $param = ["profesoreditor", "profesornoeditor"];
 list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
-
+var_dump($param1);
 $query = "SELECT
                 CONCAT(c.id,'-',u.id) as superid,
                 c.id,
@@ -209,7 +209,7 @@ echo"###########################################################################
 $param = explode("," ,$CFG->paperattendance_enrolmethod);
 var_dump($param);
 list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
-$param2 = ["profesoreditor", "profesornoeditor"];
+$param2 = ["profesoreditor"];
 $params = array_merge($param1, $param2);
 var_dump($params);
 
