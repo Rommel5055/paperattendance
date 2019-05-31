@@ -66,7 +66,7 @@ if(is_siteadmin()){
     $param = explode("," ,$CFG->paperattendance_enrolmethod);
     list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
     $param2 = ["profesoreditor"];
-    $params = array_merge($param2, $param1);
+    $params = array_merge($param1, $param2);
     $sqlcourses = "SELECT
                 CONCAT(c.id,'-',u.id) as superid,
                 c.id,
@@ -77,6 +77,27 @@ if(is_siteadmin()){
                 e.enrol,
                 r.shortname as role
 
+
+                FROM {user} AS u
+                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
+				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
+				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
+				INNER JOIN {context} ct ON (ct.id = ra.contextid)
+				INNER JOIN {course} c ON (c.id = ct.instanceid)
+				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
+				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
+
+				WHERE c.idnumber > 0
+				GROUP BY c.id, CONCAT(c.id,'-',u.id)
+				ORDER BY c.fullname";
+	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
+	echo "n° courses: ";
+	echo $ncourses;
+	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
+	
+	$paths = 1;
+	/*
+     *
                 FROM {course_categories} cat
                 INNER JOIN {course} c ON (cat.id = c.category)
                 INNER JOIN {context} ct ON (c.id = ct.instanceid)
@@ -86,28 +107,6 @@ if(is_siteadmin()){
                 INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol = ?)
 
-				WHERE c.idnumber > 0
-				GROUP BY c.id, CONCAT(c.id,'-',u.id)
-				ORDER BY c.fullname";
-	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
-	echo "n° courses: ";
-	echo $ncourses;
-	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
-	foreach($courses as $c){
-	    echo "<br>";
-	    var_dump($c);
-	}
-	
-	$paths = 1;
-	/*
-	 *          FROM {user} AS u
-                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
-				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
-				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
-				INNER JOIN {context} ct ON (ct.id = ra.contextid)
-				INNER JOIN {course} c ON (c.id = ct.instanceid)
-				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
-				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
 	 */
 }
 else{
@@ -142,9 +141,9 @@ else{
 	}
 	$param = explode("," ,$CFG->paperattendance_enrolmethod);
 	list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
-	$param2 = ["profesoreditor", "profesornoeditor"];
-	$param3 = array('50', 3);
-	$sqlcoursesparam = array_merge($param1, $param2, $param3);
+	$param2 = ["profesoreditor"];
+	$param3 = array('50');
+	$sqlcoursesparam = array_merge($param1, $param2, $categoryids, $param3);
 	$sqlcourses= "SELECT
                 CONCAT(c.id,'-',u.id) as superid,
                 c.id,
@@ -159,9 +158,9 @@ else{
 				INNER JOIN {context} ct ON (ct.id = ra.contextid)
 				INNER JOIN {course} c ON (c.id = ct.instanceid)
 				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
-				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
+				INNER JOIN {course_categories} as cat ON (cat.id = c.category and cat.id = ?)
 				WHERE c.idnumber > 0
-                AND ct.contextlevel = ? AND r.id = ?
+                AND ct.contextlevel = ?
                 AND $like
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
 				ORDER BY c.fullname";
