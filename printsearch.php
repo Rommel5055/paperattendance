@@ -65,7 +65,7 @@ if(is_siteadmin()){
 	//Query to get all the courses for the admin
     $param = explode("," ,$CFG->paperattendance_enrolmethod);
     list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
-    $param2 = ["profesoreditor"];//maybe in production the role should be profesoreditor
+    $param2 = ["profesoreditor"];
     $params = array_merge($param1, $param2);
     $sqlcourses = "SELECT
                 CONCAT(c.id,'-',u.id) as superid,

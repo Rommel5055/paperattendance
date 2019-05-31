@@ -207,7 +207,6 @@ echo"###########################################################################
 echo"###############################Print Search#####################################################<br>";
 echo"################################################################################################<br>";
 $param = explode("," ,$CFG->paperattendance_enrolmethod);
-var_dump($param);
 list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
 $param2 = ["profesoreditor"];
 $params = array_merge($param1, $param2);
