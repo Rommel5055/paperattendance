@@ -40,7 +40,7 @@ $categoryid = optional_param('categoryid', $CFG->paperattendance_categoryid, PAR
 $action = optional_param('action', 'viewform', PARAM_TEXT);
 //Page
 $page = optional_param('page', 0, PARAM_INT);
-$perpage = 3000;
+$perpage = 30;
 
 if(is_siteadmin()){
 /*	$sqlcourses = "SELECT c.id,
