@@ -179,7 +179,7 @@ switch ($action) {
 						GROUP BY c.id
 						ORDER BY c.fullname";
 		}
-		$parametros = array_merge($parametros1, $filter);
+		$parametros = array_merge($params, $filter);
 		$courses = $DB->get_records_sql($sqlcourses, $parametros);
 	
 		echo json_encode($courses);
