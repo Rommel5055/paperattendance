@@ -40,7 +40,7 @@ $categoryid = optional_param('categoryid', $CFG->paperattendance_categoryid, PAR
 $action = optional_param('action', 'viewform', PARAM_TEXT);
 //Page
 $page = optional_param('page', 0, PARAM_INT);
-$perpage = 30;
+$perpage = 3000;
 
 if(is_siteadmin()){
 /*	$sqlcourses = "SELECT c.id,
@@ -94,7 +94,9 @@ if(is_siteadmin()){
 	echo "n° courses: ";
 	echo $ncourses;
 	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
-	
+	foreach ($courses as $c){
+	    var_dump($c);
+	}
 	$paths = 1;
 	/*
      *
