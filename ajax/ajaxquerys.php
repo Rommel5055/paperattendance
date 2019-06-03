@@ -129,12 +129,26 @@ switch ($action) {
 			$param = explode("," ,$CFG->paperattendance_enrolmethod);
 			list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
 			$param2 = ["profesoreditor"];
-			$params = array_merge($param1, $param2);
+			$params = array_merge($param2, $param1);
 			$sqlcourses = "SELECT c.id,
 						c.fullname,
 						cat.name,
 						u.id as teacherid,
 						CONCAT( u.firstname, ' ', u.lastname) as teacher
+
+                        FROM {role} AS r
+                        INNER JOIN {role_assignments} ra ON (r.id= ra.roleid AND r.shortname $sqlin)
+                        INNER JOIN {user} AS u  ON ra.userid = u.id
+                        INNER JOIN {user_enrolments} ue ON ue.userid = u.id
+                        INNER JOIN {enrol} e ON e.id= ue.enrolid AND e.enrol = ?
+                        INNER JOIN {context} ct ON ct.id = ra.contextid
+                        INNER JOIN {course} c ON c.id = ct.instanceid
+                        INNER JOIN {course_categories} as cat ON cat.id = c.category
+                        WHERE c.idnumber > 0  AND (CONCAT( u.firstname, ' ', u.lastname) like ? OR c.fullname like ?)
+                        GROUP BY c.id
+						ORDER BY c.fullname";
+
+			            /*
 						FROM {user} AS u
 						INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				        INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
@@ -145,7 +159,7 @@ switch ($action) {
         				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
 						WHERE ( c.idnumber > 0 ) AND (CONCAT( u.firstname, ' ', u.lastname) like ? OR c.fullname like ?)
 						GROUP BY c.id
-						ORDER BY c.fullname";
+						ORDER BY c.fullname";*/
 		}else{ 
 			//If user is a secretary, he can see only courses from his categorie
 			$paths = unserialize(base64_decode($paths));
