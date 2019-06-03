@@ -77,21 +77,7 @@ if(is_siteadmin()){
                 e.enrol,
                 r.shortname as role
 
-                FROM {role} AS r
-                INNER JOIN {role_assignments} ra ON (r.id= ra.roleid AND r.shortname $sqlin)
-                INNER JOIN {user} AS u  ON ra.userid = u.id
-                INNER JOIN {user_enrolments} ue ON ue.userid = u.id
-                INNER JOIN {enrol} e ON e.id= ue.enrolid AND e.enrol = ?
-                INNER JOIN {context} ct ON ct.id = ra.contextid
-                INNER JOIN {course} c ON c.id = ct.instanceid
-                INNER JOIN {course_categories} as cat ON cat.id = c.category
-                WHERE c.idnumber > 0
-				GROUP BY c.id, CONCAT(c.id,'-',u.id)
-				ORDER BY c.fullname";
-
-
-
-                /*
+                
                 FROM {user} AS u
                 INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
@@ -103,7 +89,7 @@ if(is_siteadmin()){
 
 				WHERE c.idnumber > 0
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
-				ORDER BY c.fullname";*/
+				ORDER BY c.fullname";
 	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
 	echo "n° courses: ";
 	echo $ncourses;
