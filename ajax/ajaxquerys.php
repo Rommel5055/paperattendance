@@ -129,7 +129,7 @@ switch ($action) {
 			$param = explode("," ,$CFG->paperattendance_enrolmethod);
 			list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
 			$param2 = ["profesoreditor"];
-			$params = array_merge($param2, $param1);
+			$params = array_merge($param1, $param2);
 			$sqlcourses = "SELECT c.id,
 						c.fullname,
 						cat.name,
@@ -145,8 +145,8 @@ switch ($action) {
         				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
         				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
 						WHERE ( c.idnumber > 0 ) AND (CONCAT( u.firstname, ' ', u.lastname) like ? OR c.fullname like ?)
-						GROUP BY c.id
-						ORDER BY c.fullname";
+						GROUP BY c.id, CONCAT(c.id,'-',u.id)
+				        ORDER BY c.fullname";
 		}else{ 
 			//If user is a secretary, he can see only courses from his categorie
 			$paths = unserialize(base64_decode($paths));
