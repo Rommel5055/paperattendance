@@ -86,7 +86,7 @@ if(is_siteadmin()){
 				INNER JOIN {course} c ON (c.id = ct.instanceid AND e.courseid = c.id)
 				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname)
 
-				WHERE c.idnumber > 0
+				WHERE c.idnumber > 0 
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
 				ORDER BY c.fullname";
 	$ncourses = count($DB->get_records_sql($sqlcourses, $params));
