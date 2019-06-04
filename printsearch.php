@@ -95,7 +95,7 @@ if(is_siteadmin()){
 	$courses = $DB->get_records_sql($sqlcourses, $params, $page*$perpage,$perpage);
 	foreach ($courses as $c){
 	    var_dump($c);
-	}
+	}//
 	$paths = 1;
 	/*
      *
