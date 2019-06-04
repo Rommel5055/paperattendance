@@ -78,14 +78,13 @@ if(is_siteadmin()){
                 r.shortname as role
 
                 
-                FROM {user} AS u
-                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
+                FROM {user} u
+				INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
 				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
 				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
 				INNER JOIN {context} ct ON (ct.id = ra.contextid)
-				INNER JOIN {course} c ON (c.id = ct.instanceid)
-				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
-				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
+				INNER JOIN {course} c ON (c.id = ct.instanceid AND e.courseid = c.id)
+				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname)
 
 				WHERE c.idnumber > 0
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
