@@ -71,7 +71,6 @@ if(is_siteadmin()){
                 CONCAT(c.id,'-',u.id) as superid,
                 c.id,
 				c.fullname,
-				cat.name,
 				u.id as teacherid,
 				CONCAT( u.firstname, ' ', u.lastname) as teacher,
                 e.enrol,
