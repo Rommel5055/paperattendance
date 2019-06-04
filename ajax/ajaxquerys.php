@@ -147,9 +147,12 @@ switch ($action) {
 						WHERE ( c.idnumber > 0 ) AND (CONCAT( u.firstname, ' ', u.lastname) like ? OR c.fullname like ?)
 						GROUP BY c.id, CONCAT(c.id,'-',u.id)
 				        ORDER BY c.fullname";
+			$parametros = array_merge($params, $filter);
+			$courses = $DB->get_records_sql($sqlcourses, $parametros);
 		}else{ 
 			//If user is a secretary, he can see only courses from his categorie
-			$paths = unserialize(base64_decode($paths));
+			/*
+		    $paths = unserialize(base64_decode($paths));
 			$pathscount = count($paths);
 			$like = "";
 			$counter = 1;
@@ -182,7 +185,66 @@ switch ($action) {
 		}
 		$parametros = array_merge($params, $filter);
 		$courses = $DB->get_records_sql($sqlcourses, $parametros);
-
+        */ //Ihave no idea how or why this works... oh wait it doesn't
+		    $sqlcategory = "SELECT cc.*
+					FROM {course_categories} cc
+					INNER JOIN {role_assignments} ra ON (ra.userid = ?)
+					INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
+					INNER JOIN {context} co ON (co.id = ra.contextid  AND  co.instanceid = cc.id  )";
+		    
+		    $categoryparams = array($USER->id, "secrepaper");
+		    $categorys = $DB->get_records_sql($sqlcategory, $categoryparams);
+		    $categoryscount = count($categorys);
+		    $categoryids = array();
+		    $paths = array();
+		    $like = "";
+		    $counter = 1;
+		    if($categorys){
+		        foreach($categorys as $category){
+		            $categoryids[] = $category->id;
+		            $path = $category->id;
+		            $paths[] = $path;
+		            if($counter==$categoryscount)
+		                $like.= "cat.path like '%/".$path."/%' OR cat.path like '%/".$path."'";
+		                else
+		                    $like.= "cat.path like '%/".$path."/%' OR cat.path like '%/".$path."' OR ";
+		                    $counter++;
+		        }
+		        $categoryid = $categoryids[0];
+		    }else{
+		        print_error(get_string('notallowedprint', 'local_paperattendance'));
+		    }
+		    $param = explode("," ,$CFG->paperattendance_enrolmethod);
+		    list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
+		    $param2 = ["profesoreditor"];
+		    $param3 = array('50');
+		    $sqlcoursesparam = array_merge($param1, $param2, $categoryids, $param3);
+		    $sqlcourses= "SELECT
+                CONCAT(c.id,'-',u.id) as superid,
+                c.id,
+				c.fullname,
+				cat.name,
+				u.id as teacherid,
+				CONCAT( u.firstname, ' ', u.lastname) as teacher
+				FROM {user} AS u
+                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
+				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
+				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
+				INNER JOIN {context} ct ON (ct.id = ra.contextid)
+				INNER JOIN {course} c ON (c.id = ct.instanceid)
+				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
+				INNER JOIN {course_categories} as cat ON (cat.id = c.category and cat.id = ?)
+				WHERE c.idnumber > 0
+                AND ct.contextlevel = ?
+                AND $like
+				GROUP BY c.id, CONCAT(c.id,'-',u.id)
+				ORDER BY c.fullname";
+		    
+		    $parametros = array_merge($sqlcoursesparam, $filter);
+		    $courses = $DB->get_records_sql($sqlcourses, $parametros);
+		    
+		    
+		}
 	
 		echo json_encode($courses);
 		break;
