@@ -71,6 +71,7 @@ if(is_siteadmin()){
                 CONCAT(c.id,'-',u.id) as superid,
                 c.id,
 				c.fullname,
+				cat.name,
 				u.id as teacherid,
 				CONCAT( u.firstname, ' ', u.lastname) as teacher,
                 e.enrol,
@@ -84,6 +85,7 @@ if(is_siteadmin()){
 				INNER JOIN {context} ct ON (ct.id = ra.contextid)
 				INNER JOIN {course} c ON (c.id = ct.instanceid AND e.courseid = c.id)
 				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname)
+                INNER JOIN {course_categories} as cat ON (cat.id = c.category)
 
 				WHERE c.idnumber > 0 
 				GROUP BY c.id, CONCAT(c.id,'-',u.id)
