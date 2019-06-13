@@ -17,231 +17,39 @@ $param2 = ["profesoreditor", "profesornoeditor"];
 $params = array_merge($param1, $param2);
 var_dump($params);
 
-$query = "SELECT 
-                CONCAT(c.id,'-',u.id) as superid,
-                c.id,
-				c.fullname,
-				cat.name,
-				u.id as teacherid,
-				CONCAT( u.firstname, ' ', u.lastname) as teacher,
-                e.enrol, 
-                r.shortname as role
-				FROM {user} AS u
-                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
-				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
-				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
-				INNER JOIN {context} ct ON (ct.id = ra.contextid)
-				INNER JOIN {course} c ON (c.id = ct.instanceid)
-				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
-				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
-				WHERE c.idnumber > 0
-				GROUP BY c.id, CONCAT(c.id,'-',u.id)
-				ORDER BY c.fullname";
-$results = $DB->get_records_sql($query, $params);
+list ( $sqlin, $par ) = 'student';
+
+$query = "SELECT c.id,
+        count(u.id) AS nstudents,
+        c.fullname,
+        c.shortname
+        FROM mdl_course AS c
+        INNER JOIN mdl_context AS ct ON c.id = ct.instanceid
+        INNER JOIN mdl_role_assignments AS ra ON ra.contextid = ct.id
+        INNER JOIN mdl_user AS u ON u.id = ra.userid
+        INNER JOIN mdl_role AS r ON r.id = ra.roleid
+        WHERE c.id > 0 AND r.archetype $sqlin
+        Group By c.id";
+$results = $DB->get_records_sql($query, $par);
 
 echo "<table border = 1>
         <tr>
-        <th>id</th>
-        <th>Course name</th>
-        <th>cat name</th>
-        <th>editingteacher id</th>
-        <th>editingteacher</th>
-        <th>enrol</th>
-        <th>role</th>
+        <th>cid</th>
+        <th>nstudents</th>
+        <th>fullname</th>
+        <th>shortname</th>
         </tr>
         ";
 foreach ($results as $row){
     echo "<tr>";
-    echo "<td>". $row->id."</td>";
+    echo "<td>". $row->cid."</td>";
+    echo "<td>". $row->nstudents."</td>";
     echo "<td>". $row->fullname."</td>";
-    echo "<td>". $row->name."</td>";
-    echo "<td>". $row->teacherid."</td>";
-    echo "<td>". $row->teacher."</td>";
-    echo "<td>". $row->enrol."</td>";
-    echo "<td>". $row->role."</td>";
+    echo "<td>". $row->shortname."</td>";
     echo "</tr>";
 }
 echo "</table>";
 echo "<br>";
 echo"###################################################################################################<br>";
-echo"####################################Profesor by Database###########################################<br>";
 echo"###################################################################################################<br>";
-
-$param = ["database"];
-var_dump($param);
-list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
-$param2 = ["profesoreditor", "profesornoeditor"];
-$params = array_merge($param1, $param2);
-var_dump($params);
-$query = "SELECT
-                CONCAT(c.id,'-',u.id) as superid,
-                c.id,
-				c.fullname,
-				cat.name,
-				u.id as teacherid,
-				CONCAT( u.firstname, ' ', u.lastname) as teacher,
-                e.enrol,
-                r.shortname as role
-				FROM {user} AS u
-                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
-				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol $sqlin)
-				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
-				INNER JOIN {context} ct ON (ct.id = ra.contextid)
-				INNER JOIN {course} c ON (c.id = ct.instanceid)
-				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname = ?)
-				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
-				WHERE c.idnumber > 0
-				GROUP BY c.id, CONCAT(c.id,'-',u.id)
-				ORDER BY c.fullname";
-$results = $DB->get_records_sql($query, $params);
-
-echo "<table border = 1>
-        <tr>
-        <th>id</th>
-        <th>Course name</th>
-        <th>cat name</th>
-        <th>editingteacher id</th>
-        <th>editingteacher</th>
-        <th>enrol</th>
-        <th>role</th>
-        </tr>
-        ";
-foreach ($results as $row){
-    echo "<tr>";
-    echo "<td>". $row->id."</td>";
-    echo "<td>". $row->fullname."</td>";
-    echo "<td>". $row->name."</td>";
-    echo "<td>". $row->teacherid."</td>";
-    echo "<td>". $row->teacher."</td>";
-    echo "<td>". $row->enrol."</td>";
-    echo "<td>". $row->role."</td>";
-    echo "</tr>";
-}
-echo "</table>";
-echo "<br>";
-
-echo"################################################################################################<br>";
-echo"###############################All enrolment####################################################<br>";
-echo"################################################################################################<br>";
-
-$param = ["profesoreditor", "profesornoeditor"];
-list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
-var_dump($param1);
-$query = "SELECT
-                CONCAT(c.id,'-',u.id) as superid,
-                c.id,
-				c.fullname,
-				cat.name,
-				u.id as teacherid,
-				CONCAT( u.firstname, ' ', u.lastname) as teacher,
-                e.enrol,
-                r.shortname as role
-				FROM {user} AS u
-                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
-				INNER JOIN {enrol} e ON (e.id = ue.enrolid)
-				INNER JOIN {role_assignments} ra ON (ra.userid = u.id)
-				INNER JOIN {context} ct ON (ct.id = ra.contextid)
-				INNER JOIN {course} c ON (c.id = ct.instanceid)
-				INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname $sqlin)
-				INNER JOIN {course_categories} as cat ON (cat.id = c.category)
-				WHERE c.idnumber > 0
-				GROUP BY c.id, CONCAT(c.id,'-',u.id)
-				ORDER BY c.fullname";
-$results = $DB->get_records_sql($query, $param1);
-
-echo "<table border = 1>
-        <tr>
-        <th>id</th>
-        <th>Course name</th>
-        <th>cat name</th>
-        <th>editingteacher id</th>
-        <th>editingteacher</th>
-        <th>enrol</th>
-        <th>role</th>
-        </tr>
-        ";
-foreach ($results as $row){
-    echo "<tr>";
-    echo "<td>". $row->id."</td>";
-    echo "<td>". $row->fullname."</td>";
-    echo "<td>". $row->name."</td>";
-    echo "<td>". $row->teacherid."</td>";
-    echo "<td>". $row->teacher."</td>";
-    echo "<td>". $row->enrol."</td>";
-    echo "<td>". $row->role."</td>";
-    echo "</tr>";
-}
-echo "</table>";
-echo "<br>";
-
-echo"################################################################################################<br>";
-echo"###############################Print Search#####################################################<br>";
-echo"################################################################################################<br>";
-$param = explode("," ,$CFG->paperattendance_enrolmethod);
-list ( $sqlin, $param1 ) = $DB->get_in_or_equal ( $param);
-$param2 = ["profesoreditor"];
-$params = array_merge($param2, $param1);
-var_dump($params);
-$sqlcourses = "SELECT
-                CONCAT(c.id,'-',u.id) as superid,
-                c.id,
-				c.fullname,
-				cat.name,
-				u.id as teacherid,
-				CONCAT( u.firstname, ' ', u.lastname) as teacher,
-                e.enrol,
-                r.shortname as role
-                
-                FROM {course_categories} cat
-                INNER JOIN {course} c ON (cat.id = c.category)
-                INNER JOIN {context} ct ON (c.id = ct.instanceid)
-                INNER JOIN {role_assignments} ra ON (ct.id = ra.contextid)
-                INNER JOIN {role} r ON (r.id = ra.roleid AND r.shortname $sqlin)
-                INNER JOIN {user} u ON (ra.userid = u.id)
-                INNER JOIN {user_enrolments} ue ON (ue.userid = u.id)
-				INNER JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol = ?)
-				
-				WHERE c.idnumber > 0
-				GROUP BY c.id, CONCAT(c.id,'-',u.id)
-				ORDER BY c.fullname";
-$results = $DB->get_records_sql($query, $params);
-foreach($results as $r){
-    var_dump($r);
-    
-    echo "<br>";
-}
-
-echo "<table border = 1>
-        <tr>
-        <th>id</th>
-        <th>Course name</th>
-        <th>cat name</th>
-        <th>editingteacher id</th>
-        <th>editingteacher</th>
-        <th>enrol</th>
-        <th>role</th>
-        </tr>
-        ";
-foreach ($results as $row){
-    echo "<tr>";
-    echo "<td>". $row->id."</td>";
-    echo "<td>". $row->fullname."</td>";
-    echo "<td>". $row->name."</td>";
-    echo "<td>". $row->teacherid."</td>";
-    echo "<td>". $row->teacher."</td>";
-    echo "<td>". $row->enrol."</td>";
-    echo "<td>". $row->role."</td>";
-    echo "</tr>";
-}
-echo "</table>";
-echo "<br>";
-
-echo "<br>";
-echo "#########################################################################################<br>";
-$sql = "Select * from {context}";
-$results = $DB->get_records_sql($sql);
-foreach($results as $r){
-    echo "<br>";
-    var_dump($r);
-    echo "<br>";
-}
+echo"###################################################################################################<br>";
